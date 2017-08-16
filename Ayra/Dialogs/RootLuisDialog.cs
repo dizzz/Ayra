@@ -19,38 +19,16 @@ namespace Ayra.Dialogs {
     public class RootLuisDialog : LuisDialog<object> {
         [LuisIntent("None")]
         public async Task None(IDialogContext context, LuisResult result) {
-            /*string responseString = string.Empty;
-            var query = result.Query; //User Query
-            var knowledgebaseId = "0071945f-e61d-438b-bc8b-f935b029a8e8"; // Use knowledge base id created.
-            var qnamakerSubscriptionKey = "b46f5c7ab108491f8cb061aa4158f2e5"; //Use subscription key assigned to you.
-            Uri qnamakerUriBase = new Uri("https://westus.api.cognitive.microsoft.com/qnamaker/v1.0");
-            var builder = new UriBuilder($"{qnamakerUriBase}/knowledgebases/{knowledgebaseId}/generateAnswer");
-            var postBody = $"{{\"question\": \"{query}\"}}";
-            using (WebClient client = new WebClient()) {
-                client.Encoding = System.Text.Encoding.UTF8;
-                client.Headers.Add("Ocp-Apim-Subscription-Key", qnamakerSubscriptionKey);
-                client.Headers.Add("Content-Type", "application/json");
-                responseString = client.UploadString(builder.Uri, postBody);
-            }
-            QnAMakerResult response;
-            try {
-                response = JsonConvert.DeserializeObject<QnAMakerResult>(responseString);
-            } catch {
-                throw new Exception("Unable to deserialize QnA Maker response string.");
-            }
-            string answer = response.Answer;
-            if (answer.Equals("No good match found in the KB")) {
-                var a = context.MakeMessage();
-                a.Text = result.Query;
-                Search bing = new Search();
-                String question = result.Query;
-                String str = bing.BingToSearch(question);
-                await context.PostAsync(str);
+            string query = result.Query;
+            if (query.Contains("澡堂")) {
+                await context.PostAsync("很遗憾，我们俱乐部并没有澡堂");
+            } else if (query.Contains("微软")) {
+                await context.PostAsync("俱乐部提供了接近微软的渠道。加入俱乐部，就有参观微软，更有机会参与微软实习");
+
             } else {
-                await context.PostAsync(answer);
-            }*/
-            QNADialog qnadialog =  new QNADialog();
-            await context.PostAsync(qnadialog.getQNAstring(context, result));
+                QNA qnadialog = new QNA();
+                await context.PostAsync(qnadialog.getQNAstring(context, result));
+            }
             context.Wait(MessageReceived);
         }
         [LuisIntent("打招呼")]
@@ -61,7 +39,7 @@ namespace Ayra.Dialogs {
         }
         [LuisIntent("报名")]
         public async Task Register(IDialogContext context, LuisResult result) {
-            string message = $"在每年十月份俱乐部会组织招新，详情请关注俱乐部公众号:njust_mstc。";
+            string message = $"在每年十月份俱乐部会组织招新，详情请关注俱乐部公众号:njust_mstc";
             await context.PostAsync(message);
             context.Wait(this.MessageReceived);
         }
@@ -94,7 +72,23 @@ namespace Ayra.Dialogs {
         }
         [LuisIntent("介绍")]
         public async Task Rep(IDialogContext context, LuisResult result) {
-            string message = $"俱乐部现在有美工部，技术部，新媒体策划部，活动部四个部门。美工部的工作主要是做海报和宣传视频，技术部的工作主要开展一些技术活动，写代码QAQ，新媒体策划部的工作主要是管理公众号和微博，活动部的工作主要是进行活动的组织和策划";
+            string message = "";
+            if (result.Query.Contains("美工部")) {
+                message = "美工部的工作主要是做海报和宣传视频";
+            } else if (result.Query.Contains("技术部")) {
+                message = "技术部的工作主要开展一些技术活动，写代码QAQ";
+            } else if (result.Query.Contains("新媒体策划部")) {
+                message = "新媒体策划部的工作主要是管理公众号和微博";
+            } else if (result.Query.Contains("活动部")) {
+                message = "活动部的工作主要是进行活动的组织和策划";
+            } else
+                message = $"俱乐部现在有美工部，技术部，新媒体策划部，活动部四个部门，你想要了解那个部门呀？";
+            await context.PostAsync(message);
+            context.Wait(this.MessageReceived);
+        }
+        [LuisIntent("比赛")]
+        public async Task Competation(IDialogContext context, LuisResult result) {
+            string message = $"每年上半年，我们有微软组织的编程之美和南京四校的hackathon。";
             await context.PostAsync(message);
             context.Wait(this.MessageReceived);
         }
